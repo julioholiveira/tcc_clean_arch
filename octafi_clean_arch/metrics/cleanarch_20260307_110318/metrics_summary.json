@@ -1,0 +1,74 @@
+{
+  "report_title": "Clean Arch Metrics Report",
+  "scenario": "cleanarch",
+  "target": "src/core, src/mailing (arquitetura limpa)",
+  "coverage_rcfile": "/Users/juliohenrique/work/octafi_clean_arch/octafi_clean_arch/.coveragerc.cleanarch",
+  "test_command": "pytest src/core/tests/ src/mailing/tests/ -v -p no:django --override-ini=addopts=",
+  "test_exit_code": 0,
+  "generated_at": "2026-03-07 11:03:20",
+  "modules": {
+    "core": {
+      "label": "Core Module (src/core)",
+      "cyclomatic_complexity": {
+        "average": 2.303370786516854,
+        "maximum": 10,
+        "total_blocks": 445,
+        "grade_a_count": 427,
+        "grade_a_percent": 95.95505617977528,
+        "worst_block": {
+          "file": "src/core/application/use_cases/authenticate_guest.py",
+          "line": 61,
+          "name": "execute",
+          "class": "AuthenticateGuestUseCase",
+          "complexity": 10
+        }
+      },
+      "maintainability_index": {
+        "average": 79.72136843811215,
+        "minimum": 29.3513631131321,
+        "maximum": 100.0,
+        "worst_file": {
+          "file": "src/core/tests/domain/test_entities.py",
+          "mi": 29.3513631131321,
+          "rank": "A"
+        }
+      }
+    },
+    "mailing": {
+      "label": "Mailing Module (src/mailing)",
+      "cyclomatic_complexity": {
+        "average": 2.5892857142857144,
+        "maximum": 11,
+        "total_blocks": 224,
+        "grade_a_count": 210,
+        "grade_a_percent": 93.75,
+        "worst_block": {
+          "file": "src/mailing/infrastructure/bulk_sms_processor.py",
+          "line": 28,
+          "name": "process_bulk_send",
+          "class": "DjangoBulkSMSProcessor",
+          "complexity": 11
+        }
+      },
+      "maintainability_index": {
+        "average": 79.68240967694015,
+        "minimum": 23.47237786633409,
+        "maximum": 100.0,
+        "worst_file": {
+          "file": "src/mailing/tests/domain/test_entities.py",
+          "mi": 23.47237786633409,
+          "rank": "A"
+        }
+      }
+    }
+  },
+  "coverage": {
+    "line_percent": 40.637276298559584,
+    "branch_percent": 39.63963963963964,
+    "total_lines": 2069,
+    "covered_lines": 843,
+    "total_branches": 222,
+    "covered_branches": 88,
+    "measured_files": 89
+  }
+}

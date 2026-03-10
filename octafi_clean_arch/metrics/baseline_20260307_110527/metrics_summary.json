@@ -1,0 +1,74 @@
+{
+  "report_title": "Baseline Metrics Report",
+  "scenario": "baseline",
+  "target": "core, mailing (legado)",
+  "coverage_rcfile": "/Users/juliohenrique/work/octafi_clean_arch/octafi_clean_arch/.coveragerc",
+  "test_command": "python manage.py test core.tests mailing --verbosity 2",
+  "test_exit_code": 0,
+  "generated_at": "2026-03-07 11:05:37",
+  "modules": {
+    "core": {
+      "label": "Core Module (legacy core/)",
+      "cyclomatic_complexity": {
+        "average": 1.717741935483871,
+        "maximum": 15,
+        "total_blocks": 124,
+        "grade_a_count": 118,
+        "grade_a_percent": 95.16129032258065,
+        "worst_block": {
+          "file": "core/views.py",
+          "line": 144,
+          "name": "landingpage_guest",
+          "class": null,
+          "complexity": 15
+        }
+      },
+      "maintainability_index": {
+        "average": 93.94208621695488,
+        "minimum": 37.06543585452831,
+        "maximum": 100.0,
+        "worst_file": {
+          "file": "core/views.py",
+          "mi": 37.06543585452831,
+          "rank": "A"
+        }
+      }
+    },
+    "mailing": {
+      "label": "Mailing Module (legacy mailing/)",
+      "cyclomatic_complexity": {
+        "average": 1.53125,
+        "maximum": 6,
+        "total_blocks": 32,
+        "grade_a_count": 31,
+        "grade_a_percent": 96.875,
+        "worst_block": {
+          "file": "mailing/views.py",
+          "line": 98,
+          "name": "selecionar_destinatarios",
+          "class": null,
+          "complexity": 6
+        }
+      },
+      "maintainability_index": {
+        "average": 98.2886745298453,
+        "minimum": 52.082886835668525,
+        "maximum": 100.0,
+        "worst_file": {
+          "file": "mailing/views.py",
+          "mi": 52.082886835668525,
+          "rank": "A"
+        }
+      }
+    }
+  },
+  "coverage": {
+    "line_percent": 57.77479892761394,
+    "branch_percent": 32.19178082191781,
+    "total_lines": 600,
+    "covered_lines": 384,
+    "total_branches": 146,
+    "covered_branches": 47,
+    "measured_files": 17
+  }
+}

@@ -1,0 +1,28 @@
+# Dockerfile para ambiente clean arch
+# Idêntico ao Dockerfile.dev com adição de dependências exclusivas da
+# arquitetura limpa (structlog) que não estão em requirements-dev.txt.
+# Não altera Dockerfile.dev — usado apenas por docker-compose.cleanarch.yml.
+
+FROM python:3.13.1-slim
+
+RUN mkdir -p /app/octafi && groupadd app && useradd -g app app
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+ENV APP_HOME=/app/octafi
+WORKDIR $APP_HOME
+
+COPY . $APP_HOME
+
+RUN apt update && \
+    apt install -y gcc bash git libpq-dev python3-dev && \
+    pip install --no-cache-dir --trusted-host pypi.org --upgrade pip && \
+    pip install --no-cache-dir -r requirements-dev.txt && \
+    pip install --no-cache-dir structlog && \
+    rm -rf /var/lib/apt/lists/* && \
+    chown -R app:app $APP_HOME
+
+USER app
+
+ENTRYPOINT ["/app/octafi/entrypoint.sh"]

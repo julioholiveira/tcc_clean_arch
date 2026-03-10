@@ -1,0 +1,147 @@
+{
+  "generated_at": "2026-03-07 11:05:59",
+  "baseline_summary": "/Users/juliohenrique/work/octafi_clean_arch/octafi_clean_arch/metrics/baseline_20260307_110527/metrics_summary.json",
+  "cleanarch_summary": "/Users/juliohenrique/work/octafi_clean_arch/octafi_clean_arch/metrics/cleanarch_20260307_110318/metrics_summary.json",
+  "baseline_generated_at": "2026-03-07 11:05:37",
+  "cleanarch_generated_at": "2026-03-07 11:03:20",
+  "baseline_test_command": "python manage.py test core.tests mailing --verbosity 2",
+  "cleanarch_test_command": "pytest src/core/tests/ src/mailing/tests/ -v -p no:django --override-ini=addopts=",
+  "modules": {
+    "core": [
+      {
+        "module": "core",
+        "metric": "cc_average",
+        "metric_label": "CC M\u00e9dia",
+        "baseline": 1.717741935483871,
+        "cleanarch": 2.303370786516854,
+        "delta": 0.585628851032983,
+        "percent_change": 34.09294719628633,
+        "direction": "lower",
+        "interpretation": "piorou"
+      },
+      {
+        "module": "core",
+        "metric": "cc_maximum",
+        "metric_label": "CC M\u00e1xima",
+        "baseline": 15,
+        "cleanarch": 10,
+        "delta": -5,
+        "percent_change": -33.33333333333333,
+        "direction": "lower",
+        "interpretation": "melhorou"
+      },
+      {
+        "module": "core",
+        "metric": "cc_grade_a_percent",
+        "metric_label": "Grade A CC <= 5",
+        "baseline": 95.16129032258065,
+        "cleanarch": 95.95505617977528,
+        "delta": 0.7937658571946287,
+        "percent_change": 0.8341268329841859,
+        "direction": "higher",
+        "interpretation": "melhorou"
+      },
+      {
+        "module": "core",
+        "metric": "mi_average",
+        "metric_label": "MI M\u00e9dio",
+        "baseline": 93.94208621695488,
+        "cleanarch": 79.72136843811215,
+        "delta": -14.220717778842726,
+        "percent_change": -15.137749598194617,
+        "direction": "higher",
+        "interpretation": "piorou"
+      },
+      {
+        "module": "core",
+        "metric": "mi_minimum",
+        "metric_label": "MI M\u00ednimo",
+        "baseline": 37.06543585452831,
+        "cleanarch": 29.3513631131321,
+        "delta": -7.714072741396212,
+        "percent_change": -20.812038395209584,
+        "direction": "higher",
+        "interpretation": "piorou"
+      }
+    ],
+    "mailing": [
+      {
+        "module": "mailing",
+        "metric": "cc_average",
+        "metric_label": "CC M\u00e9dia",
+        "baseline": 1.53125,
+        "cleanarch": 2.5892857142857144,
+        "delta": 1.0580357142857144,
+        "percent_change": 69.09620991253645,
+        "direction": "lower",
+        "interpretation": "piorou"
+      },
+      {
+        "module": "mailing",
+        "metric": "cc_maximum",
+        "metric_label": "CC M\u00e1xima",
+        "baseline": 6,
+        "cleanarch": 11,
+        "delta": 5,
+        "percent_change": 83.33333333333334,
+        "direction": "lower",
+        "interpretation": "piorou"
+      },
+      {
+        "module": "mailing",
+        "metric": "cc_grade_a_percent",
+        "metric_label": "Grade A CC <= 5",
+        "baseline": 96.875,
+        "cleanarch": 93.75,
+        "delta": -3.125,
+        "percent_change": -3.225806451612903,
+        "direction": "higher",
+        "interpretation": "piorou"
+      },
+      {
+        "module": "mailing",
+        "metric": "mi_average",
+        "metric_label": "MI M\u00e9dio",
+        "baseline": 98.2886745298453,
+        "cleanarch": 79.68240967694015,
+        "delta": -18.60626485290514,
+        "percent_change": -18.930222573360027,
+        "direction": "higher",
+        "interpretation": "piorou"
+      },
+      {
+        "module": "mailing",
+        "metric": "mi_minimum",
+        "metric_label": "MI M\u00ednimo",
+        "baseline": 52.082886835668525,
+        "cleanarch": 23.47237786633409,
+        "delta": -28.610508969334436,
+        "percent_change": -54.9326481452652,
+        "direction": "higher",
+        "interpretation": "piorou"
+      }
+    ]
+  },
+  "coverage": [
+    {
+      "metric": "line_percent",
+      "metric_label": "Line Coverage",
+      "baseline": 57.77479892761394,
+      "cleanarch": 40.637276298559584,
+      "delta": -17.13752262905436,
+      "percent_change": -29.66262617465093,
+      "direction": "higher",
+      "interpretation": "piorou"
+    },
+    {
+      "metric": "branch_percent",
+      "metric_label": "Branch Coverage",
+      "baseline": 32.19178082191781,
+      "cleanarch": 39.63963963963964,
+      "delta": 7.44785881772183,
+      "percent_change": 23.13590185930611,
+      "direction": "higher",
+      "interpretation": "melhorou"
+    }
+  ]
+}

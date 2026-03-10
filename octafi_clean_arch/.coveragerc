@@ -1,0 +1,37 @@
+[run]
+source = core,mailing
+branch = True
+omit =
+    */migrations/*
+    */tests/*
+    */test_*.py
+    */__pycache__/*
+    */venv/*
+    */virtualenv/*
+    */site-packages/*
+    */conftest.py
+    */admin.py
+    */apps.py
+    */wsgi.py
+    */asgi.py
+
+[report]
+precision = 2
+show_missing = True
+skip_covered = False
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    @abstractmethod
+
+[html]
+directory = htmlcov
+title = Octafi Clean Arch Coverage Report
+
+[json]
+output = coverage.json
+pretty_print = True
