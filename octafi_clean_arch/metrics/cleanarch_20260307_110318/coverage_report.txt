@@ -1,0 +1,93 @@
+Name                                                                Stmts   Miss Branch BrPart   Cover   Missing
+----------------------------------------------------------------------------------------------------------------
+src/core/__init__.py                                                    0      0      0      0 100.00%
+src/core/application/__init__.py                                        0      0      0      0 100.00%
+src/core/application/dto/__init__.py                                    3      0      0      0 100.00%
+src/core/application/dto/guest_auth.py                                 31      0      0      0 100.00%
+src/core/application/dto/sms.py                                        26      0      0      0 100.00%
+src/core/application/ports/__init__.py                                  4      0      0      0 100.00%
+src/core/application/ports/customer_data_provider.py                   12      0      0      0 100.00%
+src/core/application/ports/network_controller.py                       10      0      0      0 100.00%
+src/core/application/ports/sms_gateway.py                              18      0      0      0 100.00%
+src/core/application/strategies/__init__.py                             3      0      0      0 100.00%
+src/core/application/strategies/form_selection.py                      36      2      8      1  93.18%   99, 107
+src/core/application/strategies/template_selection.py                  21      0      2      0 100.00%
+src/core/application/use_cases/__init__.py                              7      0      0      0 100.00%
+src/core/application/use_cases/authenticate_guest.py                   63      3     12      0  96.00%   176-182
+src/core/application/use_cases/authorize_network_access.py             23      0      2      0 100.00%
+src/core/application/use_cases/get_sms_status.py                       18      3      0      0  83.33%   77-79
+src/core/application/use_cases/list_guest_users.py                     15      0      0      0 100.00%
+src/core/application/use_cases/send_verification_sms.py                20      3      0      0  85.00%   69-75
+src/core/application/use_cases/update_sms_status.py                    26     26      8      0   0.00%   6-79
+src/core/application/use_cases/verify_sms_token.py                     30      3      6      0  91.67%   99-105
+src/core/domain/__init__.py                                             6      0      0      0 100.00%
+src/core/domain/entities.py                                            80      2      6      2  95.35%   58, 89
+src/core/domain/exceptions.py                                          20      0      0      0 100.00%
+src/core/domain/repositories.py                                        10      0      0      0 100.00%
+src/core/domain/services/__init__.py                                    3      0      0      0 100.00%
+src/core/domain/services/phone_validator.py                            15      0      2      0 100.00%
+src/core/domain/services/token_generator.py                            11      0      0      0 100.00%
+src/core/domain/value_objects.py                                       72      2     20      1  96.74%   30, 49
+src/core/infrastructure/__init__.py                                     0      0      0      0 100.00%
+src/core/infrastructure/external_apis/__init__.py                       0      0      0      0 100.00%
+src/core/infrastructure/external_apis/raro_adapter.py                  48     48      6      0   0.00%   7-105
+src/core/infrastructure/network/__init__.py                             0      0      0      0 100.00%
+src/core/infrastructure/network/unifi_adapter.py                       65     65      8      0   0.00%   3-127
+src/core/infrastructure/repositories/__init__.py                        0      0      0      0 100.00%
+src/core/infrastructure/repositories/sms_delivery_repository.py        60     60     16      0   0.00%   3-134
+src/core/infrastructure/repositories/sms_token_repository.py           24     24      2      0   0.00%   3-67
+src/core/infrastructure/repositories/user_repository.py                51     51      2      0   0.00%   3-148
+src/core/infrastructure/sms/__init__.py                                 0      0      0      0 100.00%
+src/core/infrastructure/sms/factory.py                                 35     35      2      0   0.00%   7-81
+src/core/infrastructure/sms/sinch_adapter.py                           55     55      4      0   0.00%   3-124
+src/core/infrastructure/sms/sms_market_adapter.py                      42     42      2      0   0.00%   3-89
+src/core/infrastructure/sms/zenvia_adapter.py                          47     47      0      0   0.00%   3-93
+src/core/infrastructure/tasks/__init__.py                               0      0      0      0 100.00%
+src/core/infrastructure/tasks/sms_status_updater.py                    33     33      2      0   0.00%   7-70
+src/core/interfaces/__init__.py                                         0      0      0      0 100.00%
+src/core/interfaces/api/__init__.py                                     0      0      0      0 100.00%
+src/core/interfaces/api/v1/__init__.py                                  0      0      0      0 100.00%
+src/core/interfaces/api/v1/dependencies.py                             28     28      0      0   0.00%   6-71
+src/core/interfaces/api/v1/serializers/__init__.py                      0      0      0      0 100.00%
+src/core/interfaces/api/v1/serializers/guest_serializers.py            57     57      4      0   0.00%   3-94
+src/core/interfaces/api/v1/serializers/sms_serializers.py              37     37      2      0   0.00%   3-67
+src/core/interfaces/api/v1/urls.py                                      6      6      0      0   0.00%   6-18
+src/core/interfaces/api/v1/views/__init__.py                            0      0      0      0 100.00%
+src/core/interfaces/api/v1/views/guest_auth_views.py                   78     78      8      0   0.00%   7-184
+src/core/interfaces/api/v1/views/guest_user_views.py                   35     35      2      0   0.00%   6-75
+src/core/interfaces/api/v1/views/sms_views.py                          55     55      6      0   0.00%   6-121
+src/mailing/__init__.py                                                 0      0      0      0 100.00%
+src/mailing/application/__init__.py                                     0      0      0      0 100.00%
+src/mailing/application/dto/__init__.py                                 2      0      0      0 100.00%
+src/mailing/application/dto/campaign.py                                43      0      0      0 100.00%
+src/mailing/application/ports/__init__.py                               2      0      0      0 100.00%
+src/mailing/application/ports/bulk_sms_processor.py                     9      0      0      0 100.00%
+src/mailing/application/use_cases/__init__.py                           6      0      0      0 100.00%
+src/mailing/application/use_cases/create_campaign.py                   28      3      4      0  90.62%   61-63
+src/mailing/application/use_cases/filter_recipients.py                 20      3      0      0  85.00%   55-57
+src/mailing/application/use_cases/schedule_campaign.py                 30      3      6      0  91.67%   61-63
+src/mailing/application/use_cases/send_bulk_sms.py                     47      8      6      0  84.91%   111-118
+src/mailing/application/use_cases/update_campaign.py                   30      5     10      2  82.50%   53, 56, 73-75
+src/mailing/domain/__init__.py                                          4      0      0      0 100.00%
+src/mailing/domain/entities.py                                         84      0     10      0 100.00%
+src/mailing/domain/exceptions.py                                       12      0      0      0 100.00%
+src/mailing/domain/repositories.py                                      9      0      0      0 100.00%
+src/mailing/infrastructure/__init__.py                                  0      0      0      0 100.00%
+src/mailing/infrastructure/bulk_sms_processor.py                       38     38     10      0   0.00%   6-78
+src/mailing/infrastructure/repositories/__init__.py                     0      0      0      0 100.00%
+src/mailing/infrastructure/repositories/campaign_repository.py         34     34      2      0   0.00%   6-80
+src/mailing/infrastructure/repositories/message_repository.py          41     41      6      0   0.00%   6-98
+src/mailing/infrastructure/repositories/recipient_repository.py        33     33     12      0   0.00%   7-84
+src/mailing/infrastructure/repositories/template_repository.py         28     28      2      0   0.00%   6-76
+src/mailing/interfaces/__init__.py                                      0      0      0      0 100.00%
+src/mailing/interfaces/api/__init__.py                                  0      0      0      0 100.00%
+src/mailing/interfaces/api/v1/__init__.py                               0      0      0      0 100.00%
+src/mailing/interfaces/api/v1/dependencies.py                          20     20      0      0   0.00%   6-51
+src/mailing/interfaces/api/v1/serializers/__init__.py                   0      0      0      0 100.00%
+src/mailing/interfaces/api/v1/serializers/campaign_serializers.py      60     60      6      0   0.00%   3-103
+src/mailing/interfaces/api/v1/urls.py                                   5      5      0      0   0.00%   5-17
+src/mailing/interfaces/api/v1/views/__init__.py                         0      0      0      0 100.00%
+src/mailing/interfaces/api/v1/views/campaign_views.py                  97     97     10      0   0.00%   6-202
+src/mailing/interfaces/api/v1/views/recipient_views.py                 48     48      6      0   0.00%   5-89
+----------------------------------------------------------------------------------------------------------------
+TOTAL                                                                2069   1226    222      6  40.64%

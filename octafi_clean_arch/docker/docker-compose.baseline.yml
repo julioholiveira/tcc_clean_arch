@@ -1,0 +1,127 @@
+services:
+  # Serviço PostgreSQL para testes de baseline
+  db_baseline:
+    image: postgres:15-alpine
+    container_name: octafi_db_baseline
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - ../../postgres-data/postgres:/var/lib/postgresql/data
+    networks:
+      - octafi_baseline_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Aplicação Django em ambiente controlado
+  web_baseline:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.dev
+    container_name: octafi_web_baseline
+    entrypoint: []
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    volumes:
+      - ../..:/app/octafi
+    ports:
+      - "8001:8000"
+    environment:
+      - SECRET_KEY=baseline-test-secret-key-do-not-use-in-production-12345
+      - DATABASE=postgres
+      - DATABASE_URL=postgres://postgres:postgres@db_baseline:5432/postgres
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=postgres
+      - SQL_USER=postgres
+      - SQL_PASSWORD=postgres
+      - SQL_HOST=db_baseline
+      - SQL_PORT=5432
+      - DEBUG=1
+      - DJANGO_SETTINGS_MODULE=octafi.settings
+      - PYTHONUNBUFFERED=1
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0,web_baseline
+      - CSRF_TRUSTED_ORIGINS=http://localhost:8001,http://127.0.0.1:8001
+      - CELERY_BROKER_URL=redis://redis_baseline:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis_baseline:6379/0
+      - SENDGRID_API_KEY=fake-sendgrid-key-for-baseline-testing
+      - RECAPTCHA_SITE_KEY=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+      - RECAPTCHA_SECRET_KEY=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ_2WE165
+      - SAFE_LIST_IPS=127.0.0.1,localhost
+    depends_on:
+      db_baseline:
+        condition: service_healthy
+      redis_baseline:
+        condition: service_started
+    networks:
+      - octafi_baseline_network
+    # Recursos fixos para comparação justa
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "1"
+          memory: 1G
+
+  # Celery worker para baseline
+  celery_baseline:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.dev
+    container_name: octafi_celery_baseline
+    entrypoint: []
+    command: ["celery", "-A", "octafi", "worker", "-l", "info"]
+    volumes:
+      - ../..:/app/octafi
+    environment:
+      - SECRET_KEY=baseline-test-secret-key-do-not-use-in-production-12345
+      - DATABASE=postgres
+      - DATABASE_URL=postgres://postgres:postgres@db_baseline:5432/postgres
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=postgres
+      - SQL_USER=postgres
+      - SQL_PASSWORD=postgres
+      - SQL_HOST=db_baseline
+      - SQL_PORT=5432
+      - DEBUG=1
+      - DJANGO_SETTINGS_MODULE=octafi.settings
+      - PYTHONUNBUFFERED=1
+      - CELERY_BROKER_URL=redis://redis_baseline:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis_baseline:6379/0
+      - SENDGRID_API_KEY=fake-sendgrid-key-for-baseline-testing
+      - RECAPTCHA_SITE_KEY=fake-recaptcha-site-key
+      - RECAPTCHA_SECRET_KEY=fake-recaptcha-secret-key
+      - SAFE_LIST_IPS=127.0.0.1,localhost
+    depends_on:
+      db_baseline:
+        condition: service_healthy
+      redis_baseline:
+        condition: service_started
+    networks:
+      - octafi_baseline_network
+
+  # Redis para Celery
+  redis_baseline:
+    image: redis:7-alpine
+    container_name: octafi_redis_baseline
+    ports:
+      - "6380:6379"
+    networks:
+      - octafi_baseline_network
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_baseline_data:/data
+
+volumes:
+  postgres_baseline_data:
+  redis_baseline_data:
+
+networks:
+  octafi_baseline_network:
+    driver: bridge

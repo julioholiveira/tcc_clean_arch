@@ -1,0 +1,132 @@
+services:
+  # Serviço PostgreSQL para testes da arquitetura limpa
+  db_cleanarch:
+    image: postgres:15-alpine
+    container_name: octafi_db_cleanarch
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - ../../postgres-data/postgres:/var/lib/postgresql/data
+    networks:
+      - octafi_cleanarch_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U octafi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Aplicação Django em ambiente controlado — clean arch
+  web_cleanarch:
+    build:
+      context: ../..
+      dockerfile: octafi_clean_arch/docker/Dockerfile.cleanarch
+    container_name: octafi_web_cleanarch
+    entrypoint: []
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    volumes:
+      - ../..:/app/octafi
+    ports:
+      - "8002:8000"
+    environment:
+      - SECRET_KEY=cleanarch-test-secret-key-do-not-use-in-production-12345
+      - DATABASE=postgres
+      - DATABASE_URL=postgres://postgres:postgres@db_cleanarch:5432/postgres
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=postgres
+      - SQL_USER=postgres
+      - SQL_PASSWORD=postgres
+      - SQL_HOST=db_cleanarch
+      - SQL_PORT=5432
+      - DEBUG=1
+      - DJANGO_SETTINGS_MODULE=octafi.settings
+      - PYTHONUNBUFFERED=1
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0,web_cleanarch
+      - CSRF_TRUSTED_ORIGINS=http://localhost:8002,http://127.0.0.1:8002
+      - CELERY_BROKER_URL=redis://redis_cleanarch:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis_cleanarch:6379/0
+      - SENDGRID_API_KEY=fake-sendgrid-key-for-cleanarch-testing
+      - RECAPTCHA_SITE_KEY=fake-recaptcha-site-key
+      - RECAPTCHA_SECRET_KEY=fake-recaptcha-secret-key
+      - SAFE_LIST_IPS=127.0.0.1,localhost
+      - CLEAN_ARCH_ENV=1
+      # src.core / src.mailing ficam em octafi_clean_arch/src/; adicionamos ao path
+      - PYTHONPATH=/app/octafi/octafi_clean_arch
+    depends_on:
+      db_cleanarch:
+        condition: service_healthy
+      redis_cleanarch:
+        condition: service_started
+    networks:
+      - octafi_cleanarch_network
+    # Mesmos recursos do baseline para comparação justa
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "1"
+          memory: 1G
+
+  # Celery worker — clean arch
+  celery_cleanarch:
+    build:
+      context: ../..
+      dockerfile: octafi_clean_arch/docker/Dockerfile.cleanarch
+    container_name: octafi_celery_cleanarch
+    entrypoint: []
+    command: ["celery", "-A", "octafi", "worker", "-l", "info"]
+    volumes:
+      - ../..:/code
+    environment:
+      - SECRET_KEY=cleanarch-test-secret-key-do-not-use-in-production-12345
+      - DATABASE=postgres
+      - DATABASE_URL=postgres://postgres:postgres@db_cleanarch:5432/postgres
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=postgres
+      - SQL_USER=postgres
+      - SQL_PASSWORD=postgres
+      - SQL_HOST=db_cleanarch
+      - SQL_PORT=5432
+      - DEBUG=1
+      - DJANGO_SETTINGS_MODULE=octafi.settings
+      - PYTHONUNBUFFERED=1
+      - CELERY_BROKER_URL=redis://redis_cleanarch:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis_cleanarch:6379/0
+      - SENDGRID_API_KEY=fake-sendgrid-key-for-cleanarch-testing
+      - RECAPTCHA_SITE_KEY=fake-recaptcha-site-key
+      - RECAPTCHA_SECRET_KEY=fake-recaptcha-secret-key
+      - SAFE_LIST_IPS=127.0.0.1,localhost
+      - CLEAN_ARCH_ENV=1
+      - PYTHONPATH=/app/octafi/octafi_clean_arch
+    depends_on:
+      db_cleanarch:
+        condition: service_healthy
+      redis_cleanarch:
+        condition: service_started
+    networks:
+      - octafi_cleanarch_network
+
+  # Redis para Celery — clean arch
+  redis_cleanarch:
+    image: redis:7-alpine
+    container_name: octafi_redis_cleanarch
+    ports:
+      - "6381:6379"
+    networks:
+      - octafi_cleanarch_network
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_cleanarch_data:/data
+
+volumes:
+  postgres_cleanarch_data:
+  redis_cleanarch_data:
+
+networks:
+  octafi_cleanarch_network:
+    driver: bridge
