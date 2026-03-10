@@ -49,8 +49,8 @@ services:
       - CELERY_BROKER_URL=redis://redis_baseline:6379/0
       - CELERY_RESULT_BACKEND=redis://redis_baseline:6379/0
       - SENDGRID_API_KEY=fake-sendgrid-key-for-baseline-testing
-      - RECAPTCHA_SITE_KEY=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
-      - RECAPTCHA_SECRET_KEY=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ_2WE165
+      - RECAPTCHA_SITE_KEY=fake-recaptcha-site-key
+      - RECAPTCHA_SECRET_KEY=fake-recaptcha-site-key
       - SAFE_LIST_IPS=127.0.0.1,localhost
     depends_on:
       db_baseline:
