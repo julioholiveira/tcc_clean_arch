@@ -1,11 +1,19 @@
 """Testes dos DTOs de Campaign"""
+
 from datetime import datetime, timedelta
+
 from src.core.domain.value_objects import CompanyId
 from src.mailing.application.dto.campaign import (
-    CreateCampaignRequest, CreateCampaignResponse,
-    FilterRecipientsRequest, FilterRecipientsResponse,
-    ScheduleCampaignRequest, SendBulkSMSRequest, SendBulkSMSResponse,
-    UpdateCampaignRequest, UpdateCampaignResponse,
+    CreateCampaignRequest,
+    CreateCampaignResponse,
+    FilterRecipientsRequest,
+    FilterRecipientsResponse,
+    ScheduleCampaignRequest,
+    ScheduleCampaignResponse,
+    SendBulkSMSRequest,
+    SendBulkSMSResponse,
+    UpdateCampaignRequest,
+    UpdateCampaignResponse,
 )
 
 
@@ -42,11 +50,38 @@ class TestUpdateCampaignRequest:
         assert req.name is None
 
 
+class TestUpdateCampaignResponse:
+    def test_success_response(self):
+        resp = UpdateCampaignResponse(success=True, message="Atualizada")
+        assert resp.success is True
+        assert resp.error_code is None
+
+    def test_error_response(self):
+        resp = UpdateCampaignResponse(success=False, message="Erro", error_code="INVALID_STATE")
+        assert resp.success is False
+        assert resp.error_code == "INVALID_STATE"
+
+
 class TestScheduleCampaignRequest:
     def test_with_future_date(self):
         future = datetime.now() + timedelta(hours=2)
         req = ScheduleCampaignRequest(campaign_id=1, scheduled_for=future)
         assert req.scheduled_for == future
+
+
+class TestScheduleCampaignResponse:
+    def test_success_response(self):
+        future = datetime.now() + timedelta(hours=2)
+        resp = ScheduleCampaignResponse(success=True, message="Agendada", scheduled_for=future)
+        assert resp.success is True
+        assert resp.scheduled_for == future
+        assert resp.error_code is None
+
+    def test_error_response(self):
+        resp = ScheduleCampaignResponse(success=False, message="Erro", error_code="INVALID_SCHEDULE_DATE")
+        assert resp.success is False
+        assert resp.scheduled_for is None
+        assert resp.error_code == "INVALID_SCHEDULE_DATE"
 
 
 class TestSendBulkSMSRequest:
@@ -60,8 +95,9 @@ class TestSendBulkSMSRequest:
 class TestSendBulkSMSResponse:
     def test_success_response(self):
         started = datetime.now()
-        resp = SendBulkSMSResponse(success=True, campaign_id=1, total_recipients=100,
-                                   sent_count=95, failed_count=5, started_at=started)
+        resp = SendBulkSMSResponse(
+            success=True, campaign_id=1, total_recipients=100, sent_count=95, failed_count=5, started_at=started
+        )
         assert resp.total_recipients == 100
         assert resp.sent_count + resp.failed_count == 100
         assert resp.error_message is None

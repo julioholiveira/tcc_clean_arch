@@ -83,9 +83,7 @@ class TestAuthenticateGuestUseCase:
         assert call_args.kwargs["destination"] == valid_request.phone
         assert "código" in call_args.kwargs["message"].lower()
 
-    def test_authenticate_guest_existing_user(
-        self, use_case, valid_request, sample_user, mock_user_repository
-    ):
+    def test_authenticate_guest_existing_user(self, use_case, valid_request, sample_user, mock_user_repository):
         """Deve autenticar usuário existente"""
         # Arrange
         mock_user_repository.find_by_phone.return_value = sample_user
@@ -100,9 +98,7 @@ class TestAuthenticateGuestUseCase:
         # Não deve criar novo usuário
         mock_user_repository.save.assert_not_called()
 
-    def test_authenticate_guest_connection_limit_exceeded(
-        self, use_case, valid_request, mock_connection_repository
-    ):
+    def test_authenticate_guest_connection_limit_exceeded(self, use_case, valid_request, mock_connection_repository):
         """Deve rejeitar quando limite de conexões for excedido"""
         # Arrange
         mock_connection_repository.count_active_connections.return_value = 5
@@ -116,9 +112,7 @@ class TestAuthenticateGuestUseCase:
         assert response.error_code == "CONNECTION_LIMIT_EXCEEDED"
         assert "conexões" in response.message.lower()
 
-    def test_authenticate_guest_sms_send_failure(
-        self, use_case, valid_request, mock_sms_gateway, mock_user_repository
-    ):
+    def test_authenticate_guest_sms_send_failure(self, use_case, valid_request, mock_sms_gateway, mock_user_repository):
         """Deve tratar falha no envio de SMS"""
         # Arrange
         mock_user_repository.find_by_phone.return_value = None
@@ -159,12 +153,8 @@ class TestAuthenticateGuestUseCase:
     ):
         """Deve rejeitar cliente inativo no Raro"""
         # Arrange
-        inactive_customer = CustomerData(
-            phone=valid_request.phone, name="João Silva", is_active=False
-        )
-        mock_customer_data_provider.get_customer_by_phone.return_value = (
-            inactive_customer
-        )
+        inactive_customer = CustomerData(phone=valid_request.phone, name="João Silva", is_active=False)
+        mock_customer_data_provider.get_customer_by_phone.return_value = inactive_customer
 
         use_case = AuthenticateGuestUseCase(
             user_repository=mock_user_repository,
@@ -193,9 +183,7 @@ class TestAuthenticateGuestUseCase:
     ):
         """Deve usar dados do Raro para cliente ativo"""
         # Arrange
-        active_customer = CustomerData(
-            phone=valid_request.phone, name="João Silva da API Raro", is_active=True
-        )
+        active_customer = CustomerData(phone=valid_request.phone, name="João Silva da API Raro", is_active=True)
         mock_customer_data_provider.get_customer_by_phone.return_value = active_customer
         mock_user_repository.find_by_phone.return_value = None
         mock_user_repository.save.return_value = User(
@@ -222,3 +210,29 @@ class TestAuthenticateGuestUseCase:
         # Verifica que nome do Raro foi usado
         saved_user = mock_user_repository.save.call_args[0][0]
         assert saved_user.name == "João Silva da API Raro"
+
+    def test_authenticate_guest_unexpected_exception(self, use_case, valid_request, mock_connection_repository):
+        """Deve tratar exceção inesperada do repositório como erro interno"""
+        # Arrange
+        mock_connection_repository.count_active_connections.side_effect = Exception("db indisponível")
+
+        # Act
+        response = use_case.execute(valid_request)
+
+        # Assert
+        assert response.success is False
+        assert response.token_sent is False
+        assert response.error_code == "INTERNAL_ERROR"
+
+    def test_authenticate_guest_user_save_failure(self, use_case, valid_request, mock_user_repository):
+        """Deve tratar falha ao persistir usuário como erro interno"""
+        # Arrange
+        mock_user_repository.find_by_phone.return_value = None
+        mock_user_repository.save.side_effect = Exception("erro ao salvar")
+
+        # Act
+        response = use_case.execute(valid_request)
+
+        # Assert
+        assert response.success is False
+        assert response.error_code == "INTERNAL_ERROR"

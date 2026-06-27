@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.core.application.dto.sms import SMSStatusItem, SMSStatusRequest
+from src.core.application.dto.sms import SMSStatusRequest
 from src.core.application.use_cases.get_sms_status import GetSMSStatusUseCase
 from src.core.domain.entities import SMSStatus
 
@@ -61,8 +61,8 @@ class TestGetSMSStatusUseCase:
         assert call_kwargs["phone"] == phone_number
 
     def test_get_status_has_more_flag(self, use_case, company_id, mock_delivery_repository):
-        from unittest.mock import Mock
         from datetime import datetime
+        from unittest.mock import Mock
 
         request = SMSStatusRequest(company_id=company_id, limit=1, offset=0)
 
@@ -83,3 +83,12 @@ class TestGetSMSStatusUseCase:
 
         assert response.total == 5
         assert response.has_more is True
+
+    def test_get_status_repository_exception(self, use_case, valid_request, mock_delivery_repository):
+        mock_delivery_repository.count_filtered.side_effect = Exception("db error")
+
+        response = use_case.execute(valid_request)
+
+        assert response.total == 0
+        assert response.items == []
+        assert response.has_more is False

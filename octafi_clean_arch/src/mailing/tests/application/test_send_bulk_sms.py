@@ -1,4 +1,5 @@
 """Testes do SendBulkSMSUseCase"""
+
 from datetime import datetime
 from unittest.mock import Mock
 
@@ -23,8 +24,15 @@ class TestSendBulkSMSUseCase:
     def valid_request(self, company_id):
         return SendBulkSMSRequest(company_id=company_id, campaign_id=1, correlation_id="test-123")
 
-    def test_send_bulk_sms_success(self, use_case, valid_request, sample_campaign,
-            mock_campaign_repository, mock_message_repository, mock_bulk_sms_processor):
+    def test_send_bulk_sms_success(
+        self,
+        use_case,
+        valid_request,
+        sample_campaign,
+        mock_campaign_repository,
+        mock_message_repository,
+        mock_bulk_sms_processor,
+    ):
         mock_campaign_repository.find_by_id.return_value = sample_campaign
         mock_message_repository.list_by_campaign.return_value = [Mock(), Mock(), Mock()]
         response = use_case.execute(valid_request)
@@ -40,8 +48,9 @@ class TestSendBulkSMSUseCase:
         assert response.success is False
         assert response.error_message is not None
 
-    def test_send_bulk_sms_no_recipients(self, use_case, valid_request, sample_campaign,
-            mock_campaign_repository, mock_message_repository):
+    def test_send_bulk_sms_no_recipients(
+        self, use_case, valid_request, sample_campaign, mock_campaign_repository, mock_message_repository
+    ):
         mock_campaign_repository.find_by_id.return_value = sample_campaign
         mock_message_repository.list_by_campaign.return_value = []
         response = use_case.execute(valid_request)
@@ -49,8 +58,15 @@ class TestSendBulkSMSUseCase:
         assert response.total_recipients == 0
         assert response.completed_at is not None
 
-    def test_send_bulk_sms_with_failures(self, use_case, valid_request, sample_campaign,
-            mock_campaign_repository, mock_message_repository, mock_bulk_sms_processor):
+    def test_send_bulk_sms_with_failures(
+        self,
+        use_case,
+        valid_request,
+        sample_campaign,
+        mock_campaign_repository,
+        mock_message_repository,
+        mock_bulk_sms_processor,
+    ):
         mock_campaign_repository.find_by_id.return_value = sample_campaign
         mock_message_repository.list_by_campaign.return_value = [Mock(), Mock(), Mock()]
         # Override the side_effect set in conftest to force a specific result
@@ -63,8 +79,9 @@ class TestSendBulkSMSUseCase:
         assert response.sent_count == 2
         assert response.failed_count == 1
 
-    def test_send_bulk_sms_updates_campaign_status(self, use_case, valid_request, sample_campaign,
-            mock_campaign_repository, mock_message_repository):
+    def test_send_bulk_sms_updates_campaign_status(
+        self, use_case, valid_request, sample_campaign, mock_campaign_repository, mock_message_repository
+    ):
         mock_campaign_repository.find_by_id.return_value = sample_campaign
         mock_message_repository.list_by_campaign.return_value = [Mock(), Mock()]
         use_case.execute(valid_request)
@@ -76,3 +93,22 @@ class TestSendBulkSMSUseCase:
         mock_campaign_repository.find_by_id.return_value = sample_campaign
         response = use_case.execute(valid_request)
         assert response.success is False
+
+    def test_send_bulk_sms_unexpected_exception_marks_failed(
+        self,
+        use_case,
+        valid_request,
+        sample_campaign,
+        mock_campaign_repository,
+        mock_message_repository,
+        mock_bulk_sms_processor,
+    ):
+        mock_campaign_repository.find_by_id.return_value = sample_campaign
+        mock_message_repository.list_by_campaign.return_value = [Mock(), Mock()]
+        mock_bulk_sms_processor.process_bulk_send.side_effect = Exception("processor offline")
+        response = use_case.execute(valid_request)
+        assert response.success is False
+        assert "interno" in response.error_message.lower()
+        # Campanha deve ser marcada como FAILED no tratamento de erro
+        saved_campaign = mock_campaign_repository.save.call_args_list[-1][0][0]
+        assert saved_campaign.status == CampaignStatus.FAILED

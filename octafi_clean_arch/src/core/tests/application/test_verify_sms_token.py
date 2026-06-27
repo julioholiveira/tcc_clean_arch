@@ -58,9 +58,7 @@ class TestVerifySMSTokenUseCase:
         assert call_args.kwargs["mac_address"] == valid_request.mac_address
         assert call_args.kwargs["user_phone"] == valid_request.phone
 
-    def test_verify_token_invalid_token(
-        self, use_case, valid_request, mock_token_repository
-    ):
+    def test_verify_token_invalid_token(self, use_case, valid_request, mock_token_repository):
         """Deve rejeitar token inválido"""
         # Arrange
         mock_token_repository.find_valid_token.return_value = None
@@ -74,9 +72,7 @@ class TestVerifySMSTokenUseCase:
         assert response.error_code == "INVALID_TOKEN"
         assert "inválido" in response.message.lower()
 
-    def test_verify_token_expired(
-        self, use_case, valid_request, sample_token_entity, mock_token_repository
-    ):
+    def test_verify_token_expired(self, use_case, valid_request, sample_token_entity, mock_token_repository):
         """Deve rejeitar token expirado"""
         # Arrange
         sample_token_entity.expires_at = datetime.now() - timedelta(minutes=1)
@@ -101,10 +97,8 @@ class TestVerifySMSTokenUseCase:
         """Deve tratar falha na autorização de rede"""
         # Arrange
         mock_token_repository.find_valid_token.return_value = sample_token_entity
-        mock_network_controller.authorize_guest.return_value = (
-            NetworkAuthorizationResult(
-                success=False, error_message="Network controller error"
-            )
+        mock_network_controller.authorize_guest.return_value = NetworkAuthorizationResult(
+            success=False, error_message="Network controller error"
         )
 
         # Act
@@ -114,3 +108,36 @@ class TestVerifySMSTokenUseCase:
         assert response.success is False
         assert response.network_authorized is False
         assert response.error_code == "NETWORK_AUTH_FAILED"
+
+    def test_verify_token_repository_exception(self, use_case, valid_request, mock_token_repository):
+        """Deve tratar exceção do repositório como erro interno"""
+        # Arrange
+        mock_token_repository.find_valid_token.side_effect = Exception("db indisponível")
+
+        # Act
+        response = use_case.execute(valid_request)
+
+        # Assert
+        assert response.success is False
+        assert response.error_code == "INTERNAL_ERROR"
+        assert "interno" in response.message.lower()
+
+    def test_verify_token_network_controller_exception(
+        self,
+        use_case,
+        valid_request,
+        sample_token_entity,
+        mock_token_repository,
+        mock_network_controller,
+    ):
+        """Deve tratar exceção do network controller como erro interno"""
+        # Arrange
+        mock_token_repository.find_valid_token.return_value = sample_token_entity
+        mock_network_controller.authorize_guest.side_effect = Exception("controller offline")
+
+        # Act
+        response = use_case.execute(valid_request)
+
+        # Assert
+        assert response.success is False
+        assert response.error_code == "INTERNAL_ERROR"

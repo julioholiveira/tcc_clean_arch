@@ -1,5 +1,7 @@
 """Testes do UpdateCampaignUseCase"""
+
 import pytest
+
 from src.mailing.application.dto.campaign import UpdateCampaignRequest
 from src.mailing.application.use_cases.update_campaign import UpdateCampaignUseCase
 from src.mailing.domain.entities import CampaignStatus
@@ -49,3 +51,13 @@ class TestUpdateCampaignUseCase:
         use_case.execute(UpdateCampaignRequest(campaign_id=1))
         updated = mock_campaign_repository.save.call_args[0][0]
         assert updated.name == original_name
+
+    def test_update_campaign_unexpected_exception(
+        self, use_case, valid_request, sample_campaign, mock_campaign_repository
+    ):
+        mock_campaign_repository.find_by_id.return_value = sample_campaign
+        mock_campaign_repository.save.side_effect = Exception("db indisponível")
+        response = use_case.execute(valid_request)
+        assert response.success is False
+        assert response.error_code == "INTERNAL_ERROR"
+        assert "interno" in response.message.lower()

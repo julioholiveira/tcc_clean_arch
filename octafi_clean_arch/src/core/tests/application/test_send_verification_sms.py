@@ -9,9 +9,7 @@ from src.core.application.use_cases.send_verification_sms import SendVerificatio
 class TestSendVerificationSMSUseCase:
     @pytest.fixture
     def use_case(self, mock_sms_gateway, mock_delivery_repository):
-        return SendVerificationSMSUseCase(
-            sms_gateway=mock_sms_gateway, delivery_repository=mock_delivery_repository
-        )
+        return SendVerificationSMSUseCase(sms_gateway=mock_sms_gateway, delivery_repository=mock_delivery_repository)
 
     @pytest.fixture
     def valid_request(self, company_id, phone_number):
@@ -40,6 +38,7 @@ class TestSendVerificationSMSUseCase:
 
     def test_send_sms_gateway_failure(self, use_case, valid_request, mock_sms_gateway):
         from src.core.application.ports.sms_gateway import SMSResult
+
         mock_sms_gateway.send.return_value = SMSResult.failure("Provider timeout")
         response = use_case.execute(valid_request)
         assert response.success is False
@@ -50,3 +49,11 @@ class TestSendVerificationSMSUseCase:
         # Use case sends anyway; gateway handles empty message
         # Just verify it returns a response without crashing
         assert hasattr(response, "success")
+
+    def test_send_sms_gateway_exception(self, use_case, valid_request, mock_sms_gateway):
+        mock_sms_gateway.send.side_effect = Exception("provider crashed")
+
+        response = use_case.execute(valid_request)
+
+        assert response.success is False
+        assert response.error_message is not None

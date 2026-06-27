@@ -1,5 +1,7 @@
 """Testes do CreateCampaignUseCase"""
+
 import pytest
+
 from src.mailing.application.dto.campaign import CreateCampaignRequest
 from src.mailing.application.use_cases.create_campaign import CreateCampaignUseCase
 from src.mailing.domain.entities import CampaignStatus
@@ -31,18 +33,24 @@ class TestCreateCampaignUseCase:
 
     def test_create_campaign_template_not_found(self, company_id, mock_campaign_repository, mock_template_repository):
         mock_template_repository.find_by_id.return_value = None
-        use_case = CreateCampaignUseCase(campaign_repository=mock_campaign_repository, template_repository=mock_template_repository)
+        use_case = CreateCampaignUseCase(
+            campaign_repository=mock_campaign_repository, template_repository=mock_template_repository
+        )
         request = CreateCampaignRequest(company_id=company_id, name="Campanha", template_id=999)
         response = use_case.execute(request)
         assert response.success is False
         assert response.error_code == "TEMPLATE_NOT_FOUND"
 
-    def test_create_campaign_scheduled(self, use_case, company_id, sample_template, mock_campaign_repository, sample_campaign):
+    def test_create_campaign_scheduled(
+        self, use_case, company_id, sample_template, mock_campaign_repository, sample_campaign
+    ):
         from datetime import datetime, timedelta
+
         future_date = datetime.now() + timedelta(hours=2)
         mock_campaign_repository.save.return_value = sample_campaign
-        request = CreateCampaignRequest(company_id=company_id, name="Campanha Agendada",
-                                        template_id=sample_template.id, scheduled_for=future_date)
+        request = CreateCampaignRequest(
+            company_id=company_id, name="Campanha Agendada", template_id=sample_template.id, scheduled_for=future_date
+        )
         use_case.execute(request)
         saved = mock_campaign_repository.save.call_args[0][0]
         assert saved.status == CampaignStatus.SCHEDULED
@@ -52,3 +60,10 @@ class TestCreateCampaignUseCase:
         response = use_case.execute(valid_request)
         assert response.success is False
         assert response.error_code == "VALIDATION_ERROR"
+
+    def test_create_campaign_unexpected_exception(self, use_case, valid_request, mock_campaign_repository):
+        mock_campaign_repository.save.side_effect = Exception("db indisponível")
+        response = use_case.execute(valid_request)
+        assert response.success is False
+        assert response.error_code == "INTERNAL_ERROR"
+        assert "interno" in response.message.lower()

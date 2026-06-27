@@ -1,4 +1,5 @@
 """Testes do ScheduleCampaignUseCase"""
+
 from datetime import datetime, timedelta
 
 import pytest
@@ -21,7 +22,9 @@ class TestScheduleCampaignUseCase:
     def valid_request(self, future_date):
         return ScheduleCampaignRequest(campaign_id=1, scheduled_for=future_date)
 
-    def test_schedule_campaign_success(self, use_case, valid_request, sample_campaign, mock_campaign_repository, future_date):
+    def test_schedule_campaign_success(
+        self, use_case, valid_request, sample_campaign, mock_campaign_repository, future_date
+    ):
         mock_campaign_repository.find_by_id.return_value = sample_campaign
         response = use_case.execute(valid_request)
         assert response.success is True
@@ -52,3 +55,13 @@ class TestScheduleCampaignUseCase:
         response = use_case.execute(valid_request)
         assert response.success is False
         assert response.error_code == "CAMPAIGN_NOT_FOUND"
+
+    def test_schedule_campaign_unexpected_exception(
+        self, use_case, valid_request, sample_campaign, mock_campaign_repository
+    ):
+        mock_campaign_repository.find_by_id.return_value = sample_campaign
+        mock_campaign_repository.save.side_effect = Exception("db indisponível")
+        response = use_case.execute(valid_request)
+        assert response.success is False
+        assert response.error_code == "INTERNAL_ERROR"
+        assert "interno" in response.message.lower()

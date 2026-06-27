@@ -1,5 +1,7 @@
 """Testes do FilterRecipientsUseCase"""
+
 import pytest
+
 from src.mailing.application.dto.campaign import FilterRecipientsRequest
 from src.mailing.application.use_cases.filter_recipients import FilterRecipientsUseCase
 
@@ -47,3 +49,11 @@ class TestFilterRecipientsUseCase:
         call_kwargs = mock_recipient_repository.list_filtered.call_args.kwargs
         assert call_kwargs["offset"] == 20
         assert call_kwargs["limit"] == 10
+
+    def test_filter_recipients_unexpected_exception(self, use_case, valid_request, mock_recipient_repository):
+        mock_recipient_repository.count_filtered.side_effect = Exception("db indisponível")
+        response = use_case.execute(valid_request)
+        assert response.total == 0
+        assert response.recipients == []
+        assert response.has_more is False
+        assert response.offset == valid_request.offset
